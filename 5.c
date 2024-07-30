@@ -1,61 +1,60 @@
-#include<stdio.h> 
-#include<stdlib.h> 
-int mutex=1,full=0,empty=3,x=0; 
-void main() 
-{ 
-int n; 
-void producer(); 
-void consumer(); 
-int wait(int); 
-int signal(int); 
-printf("\n1.PRODUCER\n2.CONSUMER\n3.EXIT\n"); 
-while(1)  
-{ 
-printf("\nENTER YOUR CHOICE\n"); 
-scanf("%d",&n); 
-switch(n) 
-{  
-case 1: 
-if((mutex==1)&&(empty!=0)) 
-producer(); 
-else 
-printf("BUFFER IS FULL"); 
-break; 
-case 2: 
-if((mutex==1)&&(full!=0)) 
-consumer(); 
-else 
-printf("BUFFER IS EMPTY"); 
-break; 
-case 3: 
-exit(0); 
-break; 
-} 
-} 
+#include <stdio.h>
+#include <string.h>
+
+int horspool(char T[], char P[], int n, int m); 
+
+int main()
+{
+    char T[100], P[100];
+    int flag;
+
+    printf("Enter the Text String: \n");
+    // fgets(T, sizeof(T), stdin);
+    // T[strcspn(T, "\n")] = '\0';
+    gets(T); 
+
+    printf("Enter the Pattern String: \n");
+    // fgets(P, sizeof(P), stdin);
+    // P[strcspn(P, "\n")] = '\0'; 
+    gets(P);
+
+    flag = horspool(T, P, strlen(T), strlen(P));
+
+    if (flag == -1)
+        printf("String not found \n");
+    else
+        printf("String found at position %d \n", flag);
+
+    return 0;
 }
-int wait(int s)  
-{ 
-return(--s);  
-} 
-int signal(int s) 
-{ 
-return(++s);  
-} 
-void producer()  
-{ 
-mutex=wait(mutex); 
-full=signal(full); 
-empty=wait(empty); 
-x++; 
-printf("\nproducer produces the item%d",x); 
-mutex=signal(mutex); 
-} 
-void consumer()  
-{ 
-mutex=wait(mutex); 
-full=wait(full); 
-empty=signal(empty); 
-printf("\n consumer consumes item%d",x); 
-x--; 
-mutex=signal(mutex);  
+
+
+int horspool(char T[], char P[], int n, int m)
+{
+    char table[256]; 
+    int i, j;
+
+    
+    for(i = 0; i < 256; i++)
+        table[i] = m; 
+
+
+    for(i = 0; i < m - 1; i++)
+        table[(unsigned char)P[i]] = m - 1 - i;
+
+    i = m - 1;
+
+    while(i < n)
+    {
+        j = 0;
+
+        while(j < m && T[i - j] == P[m - 1 - j])
+            j++;
+
+        if(j == m)
+            return i - m + 1;
+        else
+            i = i + table[(unsigned char)T[i]];
+    }
+    return -1; 
 }
